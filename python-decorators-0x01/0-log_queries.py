@@ -3,33 +3,20 @@ import functools
 from datetime import datetime
 
 #### decorator to log SQL queries
-
-def log_queries(func):
-    """Decorator that logs SQL queries before executing them"""
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        # Extract the query from function arguments
-        # Assuming the first argument or 'query' keyword argument contains the SQL
-        query = None
-        
-        # Check if query is passed as positional argument
-        if args:
-            query = args[0]
-        # Check if query is passed as keyword argument
-        elif 'query' in kwargs:
-            query = kwargs['query']
-        
-        # Log the query with timestamp
-        if query:
+def log_queries():
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            query = kwargs.get("query")
+            if not query and args:
+                query = args[0]
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             print(f"[{timestamp}] Executing SQL Query: {query}")
-        
-        # Execute the original function
-        return func(*args, **kwargs)
-    
-    return wrapper
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
-@log_queries
+@log_queries()
 def fetch_all_users(query):
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()

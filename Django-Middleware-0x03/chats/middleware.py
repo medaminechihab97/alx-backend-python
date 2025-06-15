@@ -1,5 +1,3 @@
-# chats/middleware.py
-
 import time
 from datetime import datetime, time, timedelta
 from django.http import HttpResponseForbidden
